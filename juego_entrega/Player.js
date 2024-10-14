@@ -17,6 +17,9 @@ class Player extends Character {
             myImageDead = PLAYER_PICTURE_DEAD;
 
         super(game, width, height, x, y, speed, myImage, myImageDead);
+        
+        // Inicializa el número de vidas del jugador
+        this.lives = PLAYER_LIVES; // Asigna las vidas iniciales
     }
 
     /**
@@ -25,19 +28,19 @@ class Player extends Character {
     update () {
         if (!this.dead) {
             switch (this.game.keyPressed) {
-            case KEY_LEFT:
-                if (this.x > this.speed) {
-                    this.x -= this.speed;
-                }
-                break;
-            case KEY_RIGHT:
-                if (this.x < this.game.width - this.width - this.speed) {
-                    this.x += this.speed;
-                }
-                break;
-            case KEY_SHOOT:
-                this.game.shoot(this);
-                break;
+                case KEY_LEFT:
+                    if (this.x > this.speed) {
+                        this.x -= this.speed;
+                    }
+                    break;
+                case KEY_RIGHT:
+                    if (this.x < this.game.width - this.width - this.speed) {
+                        this.x += this.speed;
+                    }
+                    break;
+                case KEY_SHOOT:
+                    this.game.shoot(this);
+                    break;
             }
         }
     }
@@ -47,10 +50,22 @@ class Player extends Character {
      */
     collide() {
         if (!this.dead) {
-            setTimeout(() => {
-                this.game.endGame();
-            }, 2000);
-            super.collide();
+            this.lives--; // Resta una vida
+            if (this.lives > 0) {
+                this.dead = true; // Marca al jugador como muerto
+                setTimeout(() => {
+                    this.dead = false; // Revive al jugador
+                    this.image.src = this.myImage; // Restaura la imagen original
+                    this.x = this.game.width / 2 - this.width / 2; // Restaura la posición
+                    this.y = this.game.height - this.height; // Restaura la posición
+                }, 2000);
+            } else {
+                // Si no quedan vidas, termina el juego
+                setTimeout(() => {
+                    this.game.endGame(); // Termina el juego
+                }, 2000);
+            }
+            super.collide(); // Llama al método collide de la superclase
         }
     }
 }

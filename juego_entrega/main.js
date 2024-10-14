@@ -13,6 +13,7 @@ const OPPONENT_HEIGHT = 5,
     PLAYER_PICTURE_DEAD = "assets/bueno_muerto.png",
     PLAYER_SPEED = 20,
     PLAYER_WIDTH = 5,
+    PLAYER_LIVES = 3, // Número de vidas inicial del jugador
     SHOT_HEIGHT = 1.5,
     SHOT_SPEED = 20,
     SHOT_PICTURE_PLAYER = "assets/shot1.png",
@@ -27,11 +28,10 @@ function collision (div1, div2) {
     const a = div1.getBoundingClientRect(),
         b = div2.getBoundingClientRect();
     return !(a.bottom < b.top || a.top > b.bottom || a.right < b.left || a.left > b.right);
-
 }
+
 var game;
 document.addEventListener("DOMContentLoaded", () => {
-        game = new Game();
-        game.start();
-    }
-);
+    game = new Game();
+    game.start();
+});

@@ -17,6 +17,7 @@ class Game {
         this.opponentShots = []; // Disparos del oponente
         this.xDown = null; //  Posición en la que el usuario ha tocado la pantalla
         this.paused = false; // Indica si el juego está pausado
+        this.score = 0; // Inicializamos la puntuación en 0
     }
 
     /**
@@ -58,6 +59,7 @@ class Game {
             this.paused = true;
         }
     }
+
     /**
      * Añade un nuevo disparo al juego, ya sea del oponente o del personaje principal
      * @param character {Character} Personaje que dispara
@@ -212,11 +214,11 @@ class Game {
     }
 
     /**
-     * resetea el juego
+     * Resetea el juego
      */
-     resetGame () {
-       document.location.reload();
-     }
+    resetGame () {
+        document.location.reload();
+    }
 
     /**
      * Actualiza los elementos del juego
