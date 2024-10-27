@@ -2,10 +2,7 @@
  * El propio juego
  */
 class Game {
-    /**
-     * Inicializa un juego
-     */
-    constructor () {
+    constructor() {
         this.started = false; // Indica si el juego ha comenzado o no
         this.ended = false; // Indica si el juego ha terminado o no
         this.keyPressed = undefined; // Indica la tecla que está pulsando el usuario
@@ -17,13 +14,15 @@ class Game {
         this.opponentShots = []; // Disparos del oponente
         this.xDown = null; //  Posición en la que el usuario ha tocado la pantalla
         this.paused = false; // Indica si el juego está pausado
-        this.score = 0; // Inicializamos la puntuación en 0
+        this.score = 0; // Nuevo atributo para la puntuación
+        this.updateScore(); // Llamada al método para inicializar la puntuación en la pantalla
+        
     }
 
     /**
      * Da comienzo a la partida
      */
-    start () {
+    start() {
         if (!this.started) {
             // RequestAnimationFrame(this.update());
             window.addEventListener("keydown", (e) => this.checkKey(e, true));
@@ -64,7 +63,7 @@ class Game {
      * Añade un nuevo disparo al juego, ya sea del oponente o del personaje principal
      * @param character {Character} Personaje que dispara
      */
-    shoot (character) {
+    shoot(character) {
         const arrayShots = character instanceof Player ? this.playerShots : this.opponentShots;
 
         arrayShots.push(new Shot(this, character));
@@ -75,7 +74,7 @@ class Game {
      * Elimina un disparo del juego cuando se sale de la pantalla o el juego se acaba
      * @param shot {Shot} Disparo que se quiere eliminar
      */
-    removeShot (shot) {
+    removeShot(shot) {
         const shotsArray = shot.type === "PLAYER" ? this.playerShots : this.opponentShots,
             index = shotsArray.indexOf(shot);
 
@@ -87,11 +86,14 @@ class Game {
     /**
      * Elimina al oponente del juego
      */
-    removeOpponent () {
-        if (this.opponent) {
+    removeOpponent() {
+        if (this.opponent instanceof Opponent) {
             document.body.removeChild(this.opponent.image);
+            this.opponent = new Boss(this);
+        } else {
+            document.body.removeChild(this.opponent.image);
+            this.opponent = new Opponent(this);
         }
-        this.opponent = new Opponent(this);
     }
 
     /**
@@ -99,22 +101,22 @@ class Game {
      * @param event {Event} Evento de tecla levantada/pulsada
      * @param isKeyDown {Boolean} Indica si la tecla está pulsada (true) o no (false)
      */
-    checkKey (event, isKeyDown) {
+    checkKey(event, isKeyDown) {
         if (!isKeyDown) {
             this.keyPressed = undefined;
         } else {
             switch (event.keyCode) {
-            case 37: // Flecha izquierda
-                this.keyPressed = KEY_LEFT;
-                break;
-            case 32: // Barra espaciadora
-                this.keyPressed = KEY_SHOOT;
-                break;
-            case 39: // Flecha derecha
-                this.keyPressed = KEY_RIGHT;
-                break;
-            case 27: case 81: // Tecla ESC o Q
-                this.pauseOrResume();
+                case 37: // Flecha izquierda
+                    this.keyPressed = KEY_LEFT;
+                    break;
+                case 32: // Barra espaciadora
+                    this.keyPressed = KEY_SHOOT;
+                    break;
+                case 39: // Flecha derecha
+                    this.keyPressed = KEY_RIGHT;
+                    break;
+                case 27: case 81: // Tecla ESC o Q
+                    this.pauseOrResume();
             }
         }
     }
@@ -124,7 +126,7 @@ class Game {
      * @param evt {Event} Evento de tocar la pantalla
      * @returns {*} Posición de la pantalla que está tocando el usuario
      */
-    getTouches (evt) {
+    getTouches(evt) {
         return evt.touches || evt.originalEvent.touches;
     }
 
@@ -132,7 +134,7 @@ class Game {
      * Maneja el evento de tocar sobre la pantalla
      * @param evt {Event} Evento de tocar la pantalla
      */
-    handleTouchStart (evt) {
+    handleTouchStart(evt) {
         const firstTouch = this.getTouches(evt)[0];
 
         this.xDown = firstTouch.clientX;
@@ -143,7 +145,7 @@ class Game {
      * Maneja el evento de arrastrar el dedo sobre la pantalla
      * @param evt {Event} Evento de arrastrar el dedo sobre la pantalla
      */
-    handleTouchMove (evt) {
+    handleTouchMove(evt) {
         if (!this.xDown) {
             return;
         }
@@ -163,7 +165,7 @@ class Game {
     /**
      * Comrpueba si el personaje principal y el oponente se han chocado entre sí o con los disparos haciendo uso del método hasCollision
      */
-    checkCollisions () {
+    checkCollisions() {
         let impact = false;
 
         for (let i = 0; i < this.opponentShots.length; i++) {
@@ -188,7 +190,7 @@ class Game {
      * @param item2 {Entity} Elemento del juego 2
      * @returns {boolean} Devuelve true si se están chocando y false si no.
      */
-    hasCollision (item1, item2) {
+    hasCollision(item1, item2) {
         if (item2 === undefined) {
             return false; // When opponent is undefined, there is no collision
         }
@@ -207,23 +209,29 @@ class Game {
     /**
      * Termina el juego
      */
-    endGame () {
+    endGame() {
         this.ended = true;
-        let gameOver = new Entity(this, this.width / 2, "auto", this.width / 4, this.height / 4, 0, GAME_OVER_PICTURE)
-        gameOver.render();
+
+        if (this.player.lives <= 0) {
+            // Si el jugador se queda sin vidas
+            let gameOverImage = new Entity(this, this.width / 2, "auto", this.width / 4, this.height / 4, 0, "assets/game_over.png");
+            gameOverImage.render();
+        }
     }
+
+    c
 
     /**
      * Resetea el juego
      */
-    resetGame () {
+    resetGame() {
         document.location.reload();
     }
 
     /**
      * Actualiza los elementos del juego
      */
-    update () {
+    update() {
         if (!this.ended) {
             this.player.update();
             if (this.opponent === undefined) {
@@ -244,7 +252,7 @@ class Game {
     /**
      * Muestra todos los elementos del juego en la pantalla
      */
-    render () {
+    render() {
         this.player.render();
         if (this.opponent !== undefined) {
             this.opponent.render();
@@ -255,5 +263,21 @@ class Game {
         this.opponentShots.forEach((shot) => {
             shot.render();
         });
+    }
+
+    /**
+     * Aumenta la puntuación y actualiza la pantalla
+     * @param points {Number} Puntos a sumar a la puntuación actual
+     */
+    increaseScore(points) {
+        this.score += points;
+        this.updateScore();
+    }
+
+    /**
+     * Actualiza la puntuación en la pantalla
+     */
+    updateScore() {
+        document.getElementById("scoreli").innerHTML = `Score: ${this.score}`;
     }
 }
