@@ -20,11 +20,20 @@ const OPPONENT_HEIGHT = 5,
     SHOT_PICTURE_OPPONENT = "assets/shot2.png",
     SHOT_WIDTH = 1.5;
 
-function getRandomNumber (range) {
+// Funciones para actualizar el score y las vidas en la pantalla
+function updateScoreDisplay(score) {
+    document.getElementById("scoreli").innerText = `Score: ${score}`;
+}
+
+function updateLivesDisplay(lives) {
+    document.getElementById("livesli").innerText = `Lives: ${lives}`;
+}
+
+function getRandomNumber(range) {
     return Math.floor(Math.random() * range);
 }
 
-function collision (div1, div2) {
+function collision(div1, div2) {
     const a = div1.getBoundingClientRect(),
         b = div2.getBoundingClientRect();
     return !(a.bottom < b.top || a.top > b.bottom || a.right < b.left || a.left > b.right);
