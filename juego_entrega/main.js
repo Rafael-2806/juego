@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Registrar el Service Worker cuando el DOM esté listo
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register("sw.js")
             .then(registration => {
                 console.log('Service Worker registrado con éxito:', registration);
             })
