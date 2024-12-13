@@ -43,4 +43,45 @@ var game;
 document.addEventListener("DOMContentLoaded", () => {
     game = new Game();
     game.start();
+
+    // Registrar el Service Worker cuando el DOM esté listo
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('Service Worker registrado con éxito:', registration);
+            })
+            .catch(error => {
+                console.error('Error al registrar el Service Worker:', error);
+            });
+    }
+
+    // Código para gestionar la instalación de la PWA
+    let deferredPrompt;
+    const installButton = document.getElementById('installButton');
+    
+    // Escucha el evento beforeinstallprompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevenimos la acción por defecto
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Mostramos el botón de instalación
+        installButton.style.display = 'block';
+        
+        // Agregamos el listener para cuando el usuario haga clic en el botón de instalación
+        installButton.addEventListener('click', () => {
+            // Mostramos el prompt de instalación
+            deferredPrompt.prompt();
+            
+            // Esperamos la respuesta del usuario
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Usuario aceptó la instalación');
+                } else {
+                    console.log('Usuario rechazó la instalación');
+                }
+                deferredPrompt = null;
+            });
+        });
+    });
 });
