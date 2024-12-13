@@ -84,4 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     });
+    
+    // Lógica adicional para ocultar el botón de instalación cuando no sea necesario
+    window.addEventListener('appinstalled', () => {
+        // Ocultamos el botón después de la instalación
+        installButton.style.display = 'none';
+    });
 });
