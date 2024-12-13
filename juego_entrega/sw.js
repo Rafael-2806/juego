@@ -1,39 +1,47 @@
-const CACHE_NAME = 'shooter-cache-v1';
+// sw.js
+
+const CACHE_NAME = 'app-cache-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/Game.js',
-  '/Boss.js',
-  '/Entity.js',
-  '/Character.js',
-  '/Player.js',
-  '/Opponent.js',
-  '/Shot.js',
-  '/main.js',
-  '/game.css',
-  '/assets/bueno.png',
-  '/assets/bueno_muerto.png',
-  '/assets/malo.png',
-  '/assets/malo_muerto.png',
-  '/assets/game_over.png',
-  '/assets/shot1.png',
-  '/assets/shot2.png'
+  '/styles.css',
+  '/script.js',
+  // Agrega más archivos estáticos que quieras almacenar en caché
 ];
- 
-self.addEventListener('install', event => {
+
+// Instalación del Service Worker
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('Service Worker: Caché en instalación');
+      return cache.addAll(urlsToCache);
+    })
   );
 });
- 
-self.addEventListener('fetch', event => {
+
+// Activación del Service Worker
+self.addEventListener('activate', (event) => {
+  console.log('Service Worker: Activado');
+  const cacheWhitelist = [CACHE_NAME];
+  
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (!cacheWhitelist.includes(cacheName)) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
+// Recuperación de archivos desde la caché o red
+self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        return response || fetch(event.request);
-      })
+    caches.match(event.request).then((cachedResponse) => {
+      return cachedResponse || fetch(event.request);
+    })
   );
 });
